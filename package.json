@@ -1,6 +1,9 @@
 {
   "name": "@idpflare/client",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "description": "OAuth 2.0 / OpenID Connect client library for IDPFlare",
   "type": "module",
   "main": "./dist/index.js",
