@@ -216,6 +216,106 @@ client.on('sessionExpired', (event) => { /* ... */ });
 | `useAuthenticatedFetch()` | Fetch function with auth headers |
 | `useRequireAuth(options?)` | Redirect to login if not authenticated |
 
+### API Hooks (for Custom UIs)
+
+| Hook | Description |
+|------|-------------|
+| `useRegister()` | Register new users |
+| `useLoginWithCredentials()` | Login with email/password + MFA |
+| `useForgotPassword()` | Request password reset email |
+| `useResetPassword()` | Reset password with token |
+| `useChangePassword()` | Change password (authenticated) |
+| `useSsoProviders()` | Get enabled SSO providers |
+| `useStartSso()` | Start SSO authentication flow |
+
+## Custom UI API
+
+Build your own login, registration, and password reset pages using the direct API:
+
+### Registration
+
+```typescript
+// Vanilla JS
+const result = await client.api.register({
+  email: 'user@example.com',
+  password: 'securePassword123',
+  givenName: 'John',
+  familyName: 'Doe',
+});
+
+if (result.requiresVerification) {
+  // Show "check your email" message
+}
+
+// React
+const { register, isLoading, error, result } = useRegister();
+await register({ email, password, name });
+```
+
+### Login with Credentials
+
+```typescript
+// Vanilla JS
+const result = await client.api.loginWithCredentials({
+  email: 'user@example.com',
+  password: 'password',
+});
+
+if (result.requiresMfa) {
+  // Show MFA verification form
+  const mfaResult = await client.api.verifyMfa({
+    mfaSessionId: result.mfaSessionId,
+    code: '123456',
+    method: 'totp', // or 'email', 'backup_codes'
+  });
+}
+
+// React
+const { login, verifyMfa, mfaRequired, availableMethods } = useLoginWithCredentials();
+await login({ email, password });
+if (mfaRequired) {
+  await verifyMfa({ mfaSessionId, code, method: 'totp' });
+}
+```
+
+### Password Reset
+
+```typescript
+// Request reset email
+await client.api.forgotPassword({ email: 'user@example.com' });
+
+// Reset with token (from email link)
+await client.api.resetPassword({
+  token: urlParams.get('token'),
+  password: 'newPassword123',
+});
+```
+
+### SSO (Social Login)
+
+```tsx
+// React - show SSO buttons
+function SsoButtons() {
+  const { providers } = useSsoProviders();
+  const { startSso, isLoading } = useStartSso();
+
+  return (
+    <div>
+      {providers.map(provider => (
+        <button key={provider} onClick={() => startSso(provider)}>
+          Sign in with {provider}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Vanilla JS
+const { providers } = await client.api.getSsoProviders();
+const { authUrl } = await client.api.startSsoFlow({ provider: 'google' });
+window.location.href = authUrl; // Redirect to Google
+```
+
 ## Login Options
 
 ```typescript

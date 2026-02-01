@@ -5,6 +5,7 @@
 
 import { generatePKCEPair, generateState, generateNonce } from "./pkce";
 import { TokenStorage } from "./storage";
+import { IdPFlareApi } from "./api";
 import type {
   IdPFlareConfig,
   TokenData,
@@ -43,6 +44,7 @@ export class IdPFlareClient {
   private eventHandlers: Map<IdPFlareEventType, Set<IdPFlareEventHandler>> = new Map();
   private refreshPromise: Promise<boolean> | null = null;
   private callbackInProgress = false;
+  private _api: IdPFlareApi | null = null;
 
   constructor(config: IdPFlareConfig) {
     // Merge with defaults
@@ -58,6 +60,38 @@ export class IdPFlareClient {
 
     // Initialize storage
     this.storage = new TokenStorage(this.config.storage, this.config.storageKeyPrefix);
+  }
+
+  // ==========================================================================
+  // API ACCESS (for custom UIs)
+  // ==========================================================================
+
+  /**
+   * Get the API client for direct authentication
+   * 
+   * Use this for building custom login, registration, and password reset UIs
+   * instead of using the OAuth redirect flow.
+   * 
+   * @example
+   * ```typescript
+   * // Register a new user
+   * const result = await client.api.register({
+   *   email: 'user@example.com',
+   *   password: 'securePassword',
+   * });
+   * 
+   * // Login with credentials
+   * const loginResult = await client.api.loginWithCredentials({
+   *   email: 'user@example.com',
+   *   password: 'securePassword',
+   * });
+   * ```
+   */
+  get api(): IdPFlareApi {
+    if (!this._api) {
+      this._api = new IdPFlareApi(this.config.authority);
+    }
+    return this._api;
   }
 
   // ==========================================================================
@@ -321,9 +355,9 @@ export class IdPFlareClient {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        const errorMsg = (errorData as Record<string, string>).error_description ?? 
-                        (errorData as Record<string, string>).error ?? 
-                        "Token exchange failed";
+        const errorMsg = (errorData as Record<string, string>).error_description ??
+          (errorData as Record<string, string>).error ??
+          "Token exchange failed";
         this.callbackInProgress = false;
         this.emitEvent("loginError", { error: errorMsg });
         return { success: false, error: errorMsg };

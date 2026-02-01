@@ -10,7 +10,7 @@ export type { IdPFlareContextState, IdPFlareContextActions, IdPFlareContextValue
 export { IdPFlareProvider } from "./provider";
 export type { IdPFlareProviderProps } from "./provider";
 
-// Hooks
+// OAuth Hooks
 export {
   useIdPFlare,
   useIsAuthenticated,
@@ -24,3 +24,23 @@ export {
   useRequireAuth,
 } from "./hooks";
 
+// API Hooks (for custom UIs)
+export {
+  useRegister,
+  useLoginWithCredentials,
+  useForgotPassword,
+  useResetPassword,
+  useChangePassword,
+  useSsoProviders,
+  useStartSso,
+} from "./hooks-api";
+
+export type {
+  UseRegisterResult,
+  UseLoginCredentialsResult,
+  UseForgotPasswordResult,
+  UseResetPasswordResult,
+  UseChangePasswordResult,
+  UseSsoProvidersResult,
+  UseStartSsoResult,
+} from "./hooks-api";

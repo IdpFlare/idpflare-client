@@ -5,6 +5,9 @@
 // Client
 export { IdPFlareClient, createIdPFlareClient } from "./client";
 
+// API (for custom UIs)
+export { IdPFlareApi, createIdPFlareApi } from "./api";
+
 // Types
 export type {
   IdPFlareConfig,
@@ -22,6 +25,28 @@ export type {
   AccountInfo,
 } from "./types";
 
+// API Types
+export type {
+  RegisterRequest,
+  RegisterResult,
+  LoginCredentialsRequest,
+  LoginCredentialsResult,
+  MfaVerifyRequest,
+  MfaVerifyResult,
+  ForgotPasswordRequest,
+  ForgotPasswordResult,
+  ResetPasswordRequest,
+  ResetPasswordResult,
+  ChangePasswordRequest,
+  ChangePasswordResult,
+  SsoProvider,
+  SsoProvidersResult,
+  SsoStartRequest,
+  SsoStartResult,
+  ResendVerificationRequest,
+  ResendVerificationResult,
+} from "./api-types";
+
 // Storage
 export { TokenStorage } from "./storage";
 export type { ITokenStorage, StorageKeys } from "./storage";
@@ -34,4 +59,3 @@ export {
   generateState,
   generateNonce,
 } from "./pkce";
-
