@@ -37,7 +37,7 @@
     "idpflare",
     "pkce"
   ],
-  "author": "IDPFlare <help@idpflare.com>",
+  "author": "IDPFlare <support@idpflare.com>",
   "license": "Polyform-Strict-1.0.0",
   "peerDependencies": {
     "react": ">=17.0.0"
