@@ -36,12 +36,13 @@ export function useAccount() {
  * Hook for login/logout actions
  */
 export function useAuth() {
-  const { login, logout, isAuthenticated, isLoading, error } = useIdPFlareContext();
+  const { login, logout, isAuthenticated, isLoggingOut, isLoading, error } = useIdPFlareContext();
 
   return {
     login,
     logout,
     isAuthenticated,
+    isLoggingOut,
     isLoading,
     error,
   };
@@ -155,14 +156,15 @@ export function useRequireAuth(options?: {
   loginRequest?: LoginRequest;
   redirectOnUnauthenticated?: boolean;
 }) {
-  const { isLoading, isAuthenticated, login, account } = useIdPFlareContext();
+  const { isLoading, isAuthenticated, isLoggingOut, login, account } = useIdPFlareContext();
   const { loginRequest, redirectOnUnauthenticated = true } = options ?? {};
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && redirectOnUnauthenticated) {
+    // Don't redirect to login if we're currently logging out
+    if (!isLoading && !isAuthenticated && !isLoggingOut && redirectOnUnauthenticated) {
       login(loginRequest);
     }
-  }, [isLoading, isAuthenticated, login, loginRequest, redirectOnUnauthenticated]);
+  }, [isLoading, isAuthenticated, isLoggingOut, login, loginRequest, redirectOnUnauthenticated]);
 
   return {
     isLoading,
