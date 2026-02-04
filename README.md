@@ -447,5 +447,5 @@ import type {
 
 ## License
 
-MIT
+Polyform Strict License 1.0.0
 
