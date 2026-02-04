@@ -21,6 +21,12 @@ export interface IdPFlareContextState {
   isAuthenticated: boolean;
 
   /**
+   * Whether the user is currently logging out
+   * This prevents useRequireAuth from triggering login during logout
+   */
+  isLoggingOut: boolean;
+
+  /**
    * Current user account info (if authenticated)
    */
   account: AccountInfo | null;
@@ -87,6 +93,7 @@ export type IdPFlareContextValue = IdPFlareContextState & IdPFlareContextActions
 const defaultContextValue: IdPFlareContextValue = {
   isLoading: true,
   isAuthenticated: false,
+  isLoggingOut: false,
   account: null,
   error: null,
   login: () => {
