@@ -66,6 +66,7 @@ export function IdPFlareProvider({
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -125,9 +126,14 @@ export function IdPFlareProvider({
       onLoginError?.(errorMsg);
     });
 
+    const unsubLogoutStart = client.on("logoutStart", () => {
+      setIsLoggingOut(true);
+    });
+
     const unsubLogout = client.on("logoutComplete", () => {
       setIsAuthenticated(false);
       setAccount(null);
+      setIsLoggingOut(false);
       onLogout?.();
     });
 
@@ -143,6 +149,7 @@ export function IdPFlareProvider({
     return () => {
       unsubLoginSuccess();
       unsubLoginError();
+      unsubLogoutStart();
       unsubLogout();
       unsubSessionExpired();
       unsubTokenRefresh();
@@ -191,6 +198,7 @@ export function IdPFlareProvider({
     () => ({
       isLoading,
       isAuthenticated,
+      isLoggingOut,
       account,
       error,
       login,
@@ -205,6 +213,7 @@ export function IdPFlareProvider({
     [
       isLoading,
       isAuthenticated,
+      isLoggingOut,
       account,
       error,
       login,
