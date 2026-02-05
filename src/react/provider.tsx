@@ -3,6 +3,7 @@
  */
 
 import { useState, useEffect, useMemo, useCallback, type ReactNode } from "react";
+import { flushSync } from "react-dom";
 import { IdPFlareClient, createIdPFlareClient } from "../core/client";
 import { IdPFlareContext, type IdPFlareContextValue } from "./context";
 import type { IdPFlareConfig, AccountInfo, LoginRequest } from "../core/types";
@@ -66,7 +67,7 @@ export function IdPFlareProvider({
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoggingOut, setIsLoggingOutState] = useState(false);
   const [account, setAccount] = useState<AccountInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,14 +127,11 @@ export function IdPFlareProvider({
       onLoginError?.(errorMsg);
     });
 
-    const unsubLogoutStart = client.on("logoutStart", () => {
-      setIsLoggingOut(true);
-    });
-
     const unsubLogout = client.on("logoutComplete", () => {
+      // Don't reset isLoggingOut here - let it stay true until page reloads after redirect
+      // This prevents useRequireAuth from triggering login before the redirect completes
       setIsAuthenticated(false);
       setAccount(null);
-      setIsLoggingOut(false);
       onLogout?.();
     });
 
@@ -149,7 +147,6 @@ export function IdPFlareProvider({
     return () => {
       unsubLoginSuccess();
       unsubLoginError();
-      unsubLogoutStart();
       unsubLogout();
       unsubSessionExpired();
       unsubTokenRefresh();
@@ -167,8 +164,11 @@ export function IdPFlareProvider({
 
   const logout = useCallback(
     (options?: { redirect?: boolean }) => {
-      // Set logging out state IMMEDIATELY to prevent useRequireAuth from triggering login
-      setIsLoggingOut(true);
+      // Use flushSync to ensure the state update is applied BEFORE client.logout() runs
+      // This prevents useRequireAuth from triggering login during logout
+      flushSync(() => {
+        setIsLoggingOutState(true);
+      });
       client.logout(options);
     },
     [client]

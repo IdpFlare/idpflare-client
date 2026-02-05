@@ -460,8 +460,6 @@ export class IdPFlareClient {
     this.emitEvent("logoutStart");
 
     const { idToken } = this.storage.getTokens();
-    this.storage.clearTokens();
-
     const shouldRedirect = options?.redirect ?? true;
 
     if (shouldRedirect) {
@@ -473,9 +471,14 @@ export class IdPFlareClient {
         logoutUrl.searchParams.set("id_token_hint", idToken);
       }
 
+      // Clear tokens AFTER redirect is initiated to prevent race conditions
+      this.storage.clearTokens();
       this.emitEvent("logoutComplete");
-      window.location.href = logoutUrl.toString();
+
+      // Use replace() for immediate navigation
+      window.location.replace(logoutUrl.toString());
     } else {
+      this.storage.clearTokens();
       this.emitEvent("logoutComplete");
     }
   }
