@@ -167,6 +167,8 @@ export function IdPFlareProvider({
 
   const logout = useCallback(
     (options?: { redirect?: boolean }) => {
+      // Set logging out state IMMEDIATELY to prevent useRequireAuth from triggering login
+      setIsLoggingOut(true);
       client.logout(options);
     },
     [client]
