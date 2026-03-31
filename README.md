@@ -1,7 +1,7 @@
 # @idpflare/client
 
 
-**[Website](https://idpflare.com) | [GitHub](https://github.com/IdpFlare)**
+**[Website](https://idpflare.com) | [GitHub](https://github.com/IdpFlare/idpflare-core)**
 
 OAuth 2.0 / OpenID Connect client library for [IDPFlare](https://idpflare.com). Provides a simple, MSAL-like API for authenticating users with your IDPFlare identity provider.
 
